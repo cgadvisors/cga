@@ -87,6 +87,10 @@
 
   var GREETING = FAQ.filter(function (f) { return f.k.indexOf('hi') !== -1; })[0];
 
+  // Touch devices (phones/tablets): don't auto-focus the input on open, or the
+  // on-screen keyboard pops up before the user taps into the field.
+  var IS_TOUCH = ('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0;
+
   // ---- state ----
   var mode = 'chat';          // 'chat' | 'phone' | 'topic'
   var lead = { phone: '', topic: '' };
@@ -213,7 +217,7 @@
   function openPanel() {
     els.panel.classList.add('cga-cb-open');
     els.launch.setAttribute('aria-expanded', 'true');
-    els.input.focus();
+    if (!IS_TOUCH) els.input.focus();
     if (!started) { started = true; setTimeout(function () { botSay(GREETING); }, 250); }
   }
   function closePanel() {
