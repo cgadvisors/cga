@@ -36,6 +36,11 @@ function doPost(e) {
       return _json({ ok: true });
     }
 
+    // Chatbot "talk to a human" request: phone number + inquiry topic.
+    if (data.type === 'chat_handoff') {
+      return _chatHandoff(data);
+    }
+
     var name = [data.firstName, data.lastName].filter(Boolean).join(' ').trim();
     var subject = SUBJECT_TAG + (name ? ' ' + name : ' New submission');
 
@@ -60,6 +65,77 @@ function doPost(e) {
 
 function doGet() {
   return _json({ ok: true, service: 'cga-contact-form' });
+}
+
+/* ---------- chatbot: talk-to-a-human handoff ---------- */
+
+function _chatHandoff(data) {
+  var phone = (data.phone == null ? '' : String(data.phone)).trim();
+  var topic = (data.topic == null ? '' : String(data.topic)).trim();
+  if (!phone) return _json({ ok: false, error: 'missing phone' });
+
+  var subject = SUBJECT_TAG + ' Live agent request' + (topic ? ' — ' + topic : '');
+  var when = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "MMM d, yyyy 'at' h:mm a");
+
+  var plain = [
+    'Live agent request — cgadvisorsgroup.com chat', '',
+    'Phone:  ' + phone,
+    'Topic:  ' + (topic || '-'),
+    'Time:   ' + when,
+    '', 'The visitor used the website chat to ask for a callback from a person.'
+  ].join('\n');
+
+  MailApp.sendEmail(TO_ADDRESS, subject, plain, {
+    name: SENDER_NAME,
+    htmlBody: _handoffHtml(phone, topic, when),
+    inlineImages: { cgaLogo: Utilities.newBlob(Utilities.base64Decode(LOGO_B64), 'image/png', 'logo.png') }
+  });
+
+  return _json({ ok: true });
+}
+
+function _handoffHtml(phone, topic, when) {
+  var F = "'Space Grotesk', Arial, Helvetica, sans-serif";
+  var B = "Arial, Helvetica, sans-serif";
+  var telHref = 'tel:' + phone.replace(/[^0-9+]/g, '');
+  return ''
++ '<!doctype html><html><body style="margin:0; padding:0; background:' + C.bg + ';">'
++ '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:' + C.bg + '; padding:24px 12px;"><tr><td align="center">'
++   '<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px; max-width:600px; background:' + C.bg2 + '; border:1px solid ' + C.line + '; border-radius:16px;">'
++     '<tr><td style="padding:26px 30px 6px 30px;">'
++       '<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>'
++         '<td align="left" style="vertical-align:middle;">'
++           '<img src="cid:cgaLogo" width="32" height="32" alt="CG Advisors" style="display:inline-block; vertical-align:middle; border:0;">'
++           '<span style="font-family:' + F + '; font-size:18px; font-weight:700; color:' + C.fg + '; vertical-align:middle; padding-left:10px;">CG Advisors</span>'
++         '</td>'
++         '<td align="right" style="vertical-align:middle;">'
++           '<span style="font-family:' + F + '; font-size:11px; letter-spacing:1px; color:' + C.accent + '; border:1px solid ' + C.line + '; border-radius:100px; padding:5px 12px; white-space:nowrap;">LIVE AGENT REQUEST</span>'
++         '</td>'
++       '</tr></table>'
++     '</td></tr>'
++     '<tr><td style="padding:12px 30px 2px 30px;">'
++       '<div style="font-family:' + F + '; font-size:23px; font-weight:700; color:' + C.fg + '; line-height:1.2;">Someone wants a callback</div>'
++       '<div style="font-family:' + B + '; font-size:14px; color:' + C.muted + '; padding-top:6px;">Requested through the website chat assistant.</div>'
++     '</td></tr>'
++     '<tr><td style="padding:16px 30px 0 30px;"><div style="border-top:1px solid ' + C.line + '; font-size:0; line-height:0;">&nbsp;</div></td></tr>'
++     '<tr><td style="padding:6px 30px 10px 30px;">'
++       '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-family:' + B + ';">'
++         '<tr><td style="padding:7px 0; font-size:13px; color:' + C.muted + '; width:130px; vertical-align:top;">Phone</td>'
++             '<td style="padding:7px 0; font-size:16px; color:' + C.fg + '; vertical-align:top;"><a href="' + telHref + '" style="color:' + C.accent + '; text-decoration:none; font-weight:700;">' + _esc(phone) + '</a></td></tr>'
++         '<tr><td style="padding:7px 0; font-size:13px; color:' + C.muted + '; width:130px; vertical-align:top;">Inquiry</td>'
++             '<td style="padding:7px 0; font-size:14px; color:' + C.fg + '; vertical-align:top;">' + (topic ? _esc(topic) : '<span style="color:' + C.muted + ';">-</span>') + '</td></tr>'
++         '<tr><td style="padding:7px 0; font-size:13px; color:' + C.muted + '; width:130px; vertical-align:top;">Received</td>'
++             '<td style="padding:7px 0; font-size:14px; color:' + C.fg + '; vertical-align:top;">' + _esc(when) + '</td></tr>'
++       '</table>'
++     '</td></tr>'
++     '<tr><td style="padding:10px 30px 24px 30px; border-top:1px solid ' + C.line + ';">'
++       '<div style="font-family:' + B + '; font-size:12px; color:' + C.muted + '; line-height:1.6;">'
++         'Call the number above to follow up.<br>'
++         'Sent from the <span style="color:' + C.accent + ';">cgadvisorsgroup.com</span> chat assistant'
++       '</div>'
++     '</td></tr>'
++   '</table>'
++ '</td></tr></table></body></html>';
 }
 
 /* ---------- email bodies ---------- */
