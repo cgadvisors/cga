@@ -221,10 +221,10 @@
     els.launch.setAttribute('aria-expanded', 'false');
   }
 
-  function build() {
-    if (document.getElementById('cga-cb-launch')) return;
-
+  function ensureStyle() {
+    if (document.getElementById('cga-cb-style')) return;
     var style = document.createElement('style');
+    style.id = 'cga-cb-style';
     style.textContent = [
       '#cga-cb-launch{position:fixed;right:16px;bottom:20px;width:60px;height:60px;border-radius:50%;',
       'background:' + C.accent + ';color:' + C.ink + ';border:none;cursor:pointer;z-index:2147483000;',
@@ -261,6 +261,11 @@
       '.cga-cb-send:hover{filter:brightness(1.08)}'
     ].join('');
     document.head.appendChild(style);
+  }
+
+  function build() {
+    ensureStyle();
+    if (document.getElementById('cga-cb-launch')) return;
 
     var launch = document.createElement('button');
     launch.id = 'cga-cb-launch';
@@ -300,9 +305,20 @@
     els.input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); send(); } });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', build);
-  } else {
+  function boot() {
     build();
+    // The site's app framework replaces <body> contents when it mounts, which
+    // removes the widget. Re-add it whenever it goes missing (one-time mount).
+    try {
+      new MutationObserver(function () {
+        if (!document.getElementById('cga-cb-launch')) build();
+      }).observe(document.body, { childList: true });
+    } catch (e) {}
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
   }
 })();
