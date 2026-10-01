@@ -226,17 +226,20 @@
     var style = document.createElement('style');
     style.id = 'cga-cb-style';
     style.textContent = [
-      '#cga-cb-launch{position:fixed;right:16px;bottom:20px;width:60px;height:60px;border-radius:50%;',
+      '#cga-cb-launch{position:fixed;right:16px;bottom:calc(20px + env(safe-area-inset-bottom,0px));width:60px;height:60px;border-radius:50%;',
       'background:' + C.accent + ';color:' + C.ink + ';border:none;cursor:pointer;z-index:2147483000;',
       'box-shadow:0 8px 24px rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;transition:transform .15s ease}',
       '#cga-cb-launch:hover{transform:scale(1.06)}',
       '#cga-cb-launch svg{width:28px;height:28px}',
-      '#cga-cb-panel{position:fixed;right:16px;bottom:90px;z-index:2147483000;',
-      'width:min(380px,calc(100vw - 32px));height:min(560px,calc(100vh - 120px));',
+      '#cga-cb-panel{position:fixed;right:16px;bottom:calc(90px + env(safe-area-inset-bottom,0px));z-index:2147483000;',
+      'width:min(380px,calc(100vw - 32px));height:min(560px,calc(100vh - 130px));height:min(560px,calc(100dvh - 130px));',
       'background:' + C.panel + ';border:1px solid ' + C.line + ';border-radius:18px;overflow:hidden;',
       'display:none;flex-direction:column;box-shadow:0 20px 50px rgba(0,0,0,.55);',
       'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}',
       '#cga-cb-panel.cga-cb-open{display:flex}',
+      '@media (max-width:480px){#cga-cb-panel{left:12px;right:12px;width:auto;',
+      'bottom:calc(84px + env(safe-area-inset-bottom,0px));',
+      'height:calc(100vh - 96px);height:calc(100dvh - 96px - env(safe-area-inset-bottom,0px))}}',
       '.cga-cb-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid ' + C.line + '}',
       '.cga-cb-title{display:flex;align-items:center;gap:9px;color:' + C.fg + ';font-weight:700;font-size:15px}',
       '.cga-cb-title .dot{width:8px;height:8px;border-radius:50%;background:' + C.accent + ';box-shadow:0 0 0 3px rgba(83,222,115,.2)}',
