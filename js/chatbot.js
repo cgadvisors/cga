@@ -29,60 +29,145 @@
 
   // Scripted FAQ. First entry whose keyword appears in the message wins.
   // `handoff:true` starts the talk-to-a-human flow. `q` = quick-reply buttons.
+  // ============================================================
+  //  KNOWLEDGE BASE — edit freely. Each entry:
+  //    { k:[keywords/synonyms], a:'answer', q:[quick replies], handoff? }
+  //  Matching is BEST-SCORE (not first-match): the entry whose keywords
+  //  best match the visitor's words wins. Multi-word keywords score higher.
+  //
+  //  >>> TODO / GAPS — these answers are intentionally generic and route to a
+  //      person so the bot never invents specifics. Replace with real info:
+  //        'process'    engagement steps        'timeline'  typical timelines
+  //        'industries' full list of sectors    'support'   existing-client support/SLA
+  //        'security'   NDA / data handling      'remote'    remote vs on-site
+  //        'careers'    hiring / how to apply    'partner'   partnership handling
+  // ============================================================
   var FAQ = [
-    { k: ['human', 'agent', 'person', 'representative', 'real person', 'talk to someone',
-          'speak to someone', 'speak with someone', 'live agent', 'call me', 'callback',
-          'call back', 'salesperson', 'speak to a', 'talk to a human'], handoff: true },
+    // ---- talk to a human (handoff) ----
+    { k: ['human','agent','person','representative','real person','talk to someone',
+          'speak to someone','speak with someone','speak to a','live agent','call me',
+          'callback','call back','salesperson','contact me','have someone call','reach out to me'],
+      handoff: true },
 
-    { k: ['service', 'offer', 'what do you provide', 'help with', 'what can you help'],
-      a: 'We work across three areas:\n\n• Strategy & Transformation\n• Product & Growth\n• Technology & Autonomous Systems\n\nAsk about any of them, or I can connect you with a person.',
-      q: ['Strategy & Transformation', 'Product & Growth', 'Technology', 'Talk to a human'] },
+    // ---- about / what we do ----
+    { k: ['what do you do','who are you','about you','tell me about','what is cg','what does cg',
+          'your company','consultancy','consulting','consultant'],
+      a: 'CG Advisors LLC is a consulting firm specializing in product strategy, business transformation, and technology solutions \u2014 delivered with white-glove attention to detail. We partner with enterprises and founders to turn ambitious ideas into working software and the agentic systems that run them.',
+      q: ['Our services','Your work','Talk to a human'] },
 
-    { k: ['strateg', 'transformation', 'operating plan'],
-      a: 'Strategy & Transformation — you have big ideas; we turn them into an operating plan, and the metrics to prove it’s working.' },
+    // ---- services overview (drills down) ----
+    { k: ['service','offer','offering','what do you provide','what can you help','capabilities','what do you sell'],
+      a: 'We work across three areas:\n\n\u2022 Strategy & Transformation\n\u2022 Product & Growth\n\u2022 Technology & Autonomous Systems\n\nTap one for detail, or I can connect you with a person.',
+      q: ['Strategy & Transformation','Product & Growth','Technology','Talk to a human'] },
 
-    { k: ['product', 'growth', 'product-market', 'market fit', 'pmf'],
-      a: 'Product & Growth — we evolve product ideas into real product-market fit, validated by customers, not assumptions.' },
+    { k: ['strateg','transformation','operating plan','operating model','roadmap','advisory'],
+      a: 'Strategy & Transformation \u2014 you have big ideas; we turn them into an operating plan and the metrics to prove it\u2019s working. That means clarifying goals, shaping the roadmap, and standing up the measures to track progress.',
+      q: ['Product & Growth','Technology','Talk to a human'] },
 
-    { k: ['technolog', 'engineering', 'software', 'app', 'agent', 'agentic', 'automation',
-          'autonomous', 'cloud', 'aws', 'azure', 'gcp'],
-      a: 'Technology & Autonomous Systems — we design, build, and host web, mobile & dashboard apps, AI agents, and automation pipelines, deployed on AWS, Azure & Google Cloud.' },
+    { k: ['product','growth','product market','market fit','pmf','mvp','discovery','validation','user research'],
+      a: 'Product & Growth \u2014 we evolve product ideas into real product-market fit, validated by customers, not assumptions. We help you test the riskiest ideas quickly and build what earns traction.',
+      q: ['Strategy & Transformation','Technology','Talk to a human'] },
 
-    { k: ['what do you do', 'who are you', 'about', 'tell me about', 'what is cg',
-          'what does cg', 'company', 'consult'],
-      a: 'CG Advisors LLC is a consulting firm specializing in product strategy, business transformation, and technology solutions — delivered with white-glove attention to detail. We partner with enterprises and founders to turn ambitious ideas into working software and the agentic systems that run them.',
-      q: ['Our services', 'Your work', 'Talk to a human'] },
+    { k: ['technolog','engineering','build','software','develop','web app','mobile app','dashboard','platform','integration','api'],
+      a: 'Technology & Autonomous Systems \u2014 we design, build, and host:\n\n\u2022 Web, mobile & dashboard applications\n\u2022 AI agents & automation pipelines\n\u2022 Predictive models\n\n\u2026deployed on AWS, Azure & Google Cloud.',
+      q: ['AI & agentic systems','Tech stack','Talk to a human'] },
 
-    { k: ['work', 'case stud', 'portfolio', 'project', 'client', 'example'],
-      a: 'A few recent projects:\n\n• A financial analytics dashboard for an international financial institution\n• A mobile app for a dental laboratory services company\n• An eCommerce solution for a personal-services startup\n\nWant to discuss something similar?',
+    // ---- AI / agentic explainer ----
+    { k: ['ai','artificial intelligence','agent','agentic','autonomous','automation','llm',
+          'machine learning','predictive','chatbot'],
+      a: 'A big part of our work is agentic systems \u2014 AI agents and automation that keep processes running around the clock, plus predictive models that turn your data into decisions. We build these into your product and operations, not as bolt-ons.',
+      q: ['Tech stack','Talk to a human'] },
+
+    // ---- selected work / case studies ----
+    { k: ['work','case stud','portfolio','project','client','example','proof','past work','references'],
+      a: 'A few recent projects:\n\n\u2022 A financial analytics dashboard for an international financial institution\n\u2022 A mobile app for a dental laboratory services company (healthcare)\n\u2022 An eCommerce solution for a personal-services startup\n\nWant to discuss something similar?',
+      q: ['Industries you serve','Talk to a human'] },
+
+    // GAP: confirm full list of industries.
+    { k: ['industr','sector','vertical','domain','fintech','finance','financial','healthcare',
+          'health care','retail','ecommerce','e commerce'],
+      a: 'We\u2019ve delivered across financial services, healthcare, and retail / eCommerce, among others. Tell us about your space and we can speak to relevant experience.',
+      q: ['Our services','Talk to a human'] },
+
+    // ---- who we work with ----
+    { k: ['who do you work with','startup','founder','enterprise','small business','scale up','scaleup'],
+      a: 'We partner with both enterprises and founders \u2014 from established organizations modernizing how they operate to startups building their first product.',
+      q: ['Our services','Talk to a human'] },
+
+    // ---- tech stack ----
+    { k: ['tech stack','stack','technologies','tools','languages','framework','built with','what tech'],
+      a: 'Our toolkit includes TypeScript, React, Next.js, Node, Python, PostgreSQL, Inngest, Vercel, GitHub, MCP, and Claude Code. We\u2019re pragmatic \u2014 we pick the right tools for your goals.',
       q: ['Talk to a human'] },
 
-    { k: ['stack', 'technologies', 'tools', 'languages', 'framework'],
-      a: 'Our toolkit includes TypeScript, React, Next.js, Node, Python, PostgreSQL, Inngest, Vercel, GitHub, MCP, and Claude Code.' },
-
-    { k: ['where', 'located', 'location', 'based', 'office', 'address', 'washington'],
-      a: 'We’re based in Washington, DC.' },
-
-    { k: ['contact', 'email', 'reach', 'get in touch', 'phone', 'number'],
-      a: 'You can email us at info@cgadvisorsgroup.com or use the contact form on this page. I can also have someone call you — just tap below.',
+    // GAP: replace with your real engagement steps.
+    { k: ['process','how do you work','how it works','engagement','get started','getting started',
+          'next step','onboarding','work together','what happens','steps'],
+      a: 'Most engagements start with a short discovery conversation to understand your goals, then we scope the work and propose a plan. The fastest way to get specifics for your situation is a quick call.',
       q: ['Talk to a human'] },
 
-    { k: ['price', 'pricing', 'cost', 'rate', 'how much', 'budget', 'quote', 'fee'],
-      a: 'Every engagement is scoped individually, so the best next step is a quick conversation. Want someone to reach out?',
+    // GAP: confirm typical timelines.
+    { k: ['how long','timeline','timeframe','time frame','duration','how quickly','turnaround','when can you start'],
+      a: 'Timelines depend on scope \u2014 we\u2019ll give you a realistic estimate after a short discovery call. Many efforts start with a focused first phase so you see value quickly.',
       q: ['Talk to a human'] },
 
-    { k: ['hi', 'hello', 'hey', 'good morning', 'good afternoon', 'good evening', 'howdy'],
-      a: 'Hi! I’m the CG Advisors assistant. I can answer quick questions about what we do, or connect you with a person. What would you like to know?',
-      q: ['What do you do?', 'Our services', 'Talk to a human'] },
+    // ---- pricing ----
+    { k: ['price','pricing','cost','rate','how much','budget','quote','fee','expensive','charge','afford'],
+      a: 'Every engagement is scoped individually, so pricing depends on what you need. The best next step is a short conversation so we can give you an accurate picture.',
+      q: ['Talk to a human'] },
 
-    { k: ['thank', 'appreciate', 'cheers'],
-      a: 'You’re welcome! Anything else I can help with?',
-      q: ['Our services', 'Talk to a human'] }
+    // GAP: confirm existing-client support channel / hours / SLA.
+    { k: ['support','existing customer','existing client','help desk','issue','bug','broken',
+          'not working','problem','maintenance','sla'],
+      a: 'If you\u2019re an existing client and need support, the quickest path is to reach your CG Advisors contact directly. I can also pass your details to the team right now.',
+      q: ['Talk to a human'] },
+
+    // GAP: replace with your real stance on confidentiality / data.
+    { k: ['security','confidential','nda','privacy','data protection','compliance','gdpr','hipaa'],
+      a: 'We take confidentiality and data handling seriously and are happy to discuss specifics \u2014 including NDAs \u2014 on a call.',
+      q: ['Talk to a human'] },
+
+    // ---- location ----
+    { k: ['where','located','location','based','office','address','washington'],
+      a: 'We\u2019re based in Washington, DC.',
+      q: ['Talk to a human'] },
+
+    // GAP: confirm remote vs on-site / travel.
+    { k: ['remote','onsite','on site','in person','travel','work from','where do you work'],
+      a: 'We work with clients wherever they are. If location matters for your project, mention it on a call and we\u2019ll sort out the details.',
+      q: ['Talk to a human'] },
+
+    // GAP: confirm hiring / where to apply.
+    { k: ['career','job','hiring','join the team','work for you','apply','resume','recruit'],
+      a: 'Thanks for your interest! For career inquiries, email info@cgadvisorsgroup.com with a short note and your resume.',
+      q: [] },
+
+    // ---- contact ----
+    { k: ['contact','email','reach','get in touch','phone','number'],
+      a: 'You can email us at info@cgadvisorsgroup.com or use the contact form on this page. I can also have someone call you \u2014 just tap below.',
+      q: ['Talk to a human'] },
+
+    // GAP: confirm partnership/vendor handling.
+    { k: ['partner','partnership','vendor','supplier','collaborate','referral','reseller'],
+      a: 'For partnership or vendor inquiries, email info@cgadvisorsgroup.com and we\u2019ll route it to the right person.',
+      q: ['Talk to a human'] },
+
+    // ---- pleasantries (last: lose score ties to real topics) ----
+    { k: ['hi','hello','hey','good morning','good afternoon','good evening','howdy','greetings'],
+      a: 'Hi! I\u2019m the CG Advisors assistant. I can answer quick questions about what we do, or connect you with a person. What would you like to know?',
+      q: ['What do you do?','Our services','Talk to a human'] },
+
+    { k: ['thank','appreciate','cheers'],
+      a: 'You\u2019re welcome! Anything else I can help with?',
+      q: ['Our services','Talk to a human'] },
+
+    { k: ['bye','goodbye','see ya','that is all','no thanks','nothing else','no thank'],
+      a: 'Thanks for stopping by \u2014 reach us anytime at info@cgadvisorsgroup.com.',
+      q: [] }
   ];
 
   var FALLBACK = {
-    a: 'I’m a simple assistant, so I may not have caught that. I can tell you about CG Advisors’ services, or connect you with a person.',
-    q: ['Our services', 'Talk to a human']
+    a: 'I didn\u2019t quite catch that. I can help with any of these \u2014 or connect you with a person:',
+    q: ['Our services','Your work','Pricing','Talk to a human']
   };
 
   var GREETING = FAQ.filter(function (f) { return f.k.indexOf('hi') !== -1; })[0];
@@ -104,14 +189,24 @@
   function norm(s) { return String(s || '').toLowerCase().trim(); }
   function digits(s) { return (String(s).match(/\d/g) || []).length; }
 
-  function matchFAQ(text) {
-    var t = norm(text);
-    for (var i = 0; i < FAQ.length; i++) {
-      for (var j = 0; j < FAQ[i].k.length; j++) {
-        if (t.indexOf(FAQ[i].k[j]) !== -1) return FAQ[i];
-      }
+  function scoreEntry(entry, msg) {
+    var s = 0;
+    for (var i = 0; i < entry.k.length; i++) {
+      var kw = entry.k[i];
+      if (msg.indexOf(' ' + kw) !== -1) s += (kw.indexOf(' ') !== -1 ? 2 : 1);
     }
-    return null;
+    return s;
+  }
+
+  // Best-match (not first-match): highest-scoring entry wins; 0 => fallback.
+  function bestMatch(text) {
+    var msg = ' ' + norm(text).replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ') + ' ';
+    var best = null, score = 0;
+    for (var i = 0; i < FAQ.length; i++) {
+      var sc = scoreEntry(FAQ[i], msg);
+      if (sc > score) { score = sc; best = FAQ[i]; }
+    }
+    return score > 0 ? best : null;
   }
 
   // ---- rendering ----
@@ -155,7 +250,7 @@
     if (mode === 'phone') { return takePhone(text); }
     if (mode === 'topic') { return takeTopic(text); }
 
-    var hit = matchFAQ(text);
+    var hit = bestMatch(text);
     if (hit && hit.handoff) { return startHandoff(); }
     setTimeout(function () { botSay(hit || FALLBACK); }, 180);
   }
